@@ -1,0 +1,22 @@
+[project]
+name = "listen-server"
+version = "0.1.0"
+description = "监听后台服务"
+readme = "README.md"
+authors = [
+    { name = "PigZhu", email = "627180300@qq.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "psutil>=7.2.2",
+]
+
+[project.scripts]
+listen-server = "listen_server:main"
+
+[project.gui-scripts]
+listen-server-gui = "listen_server:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
