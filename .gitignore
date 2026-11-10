@@ -2,8 +2,11 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
+
+# 打包产物（python run_build.py 生成）
 build/
 dist/
+*.spec
 
 # 虚拟环境
 .venv/

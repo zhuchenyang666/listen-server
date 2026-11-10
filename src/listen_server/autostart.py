@@ -1,4 +1,4 @@
-"""开机自启：登录 Windows 后运行 `python -m listen_server --autostart`，启动标记了自启的服务。"""
+"""开机自启：登录 Windows 后运行 `listen-server.exe --autostart`（源码运行时为 `pythonw -m listen_server --autostart`），启动标记了自启的服务。"""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from listen_server.config import APP_DIR
+from listen_server.config import APP_DIR, FROZEN
 from listen_server.models import ServiceConfig
 from listen_server.store import load_services
 
@@ -17,6 +17,8 @@ LOG_FILE = APP_DIR / "autostart.log"
 
 
 def launcher_command() -> str:
+    if FROZEN:
+        return f'"{Path(sys.executable).resolve()}" --autostart'
     exe = Path(sys.executable)
     pythonw = exe.with_name("pythonw.exe")
     if pythonw.exists():

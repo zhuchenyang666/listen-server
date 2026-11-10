@@ -175,7 +175,7 @@ src/listen_server/
 
 ### 5.2 数据文件
 
-全部位于 `~/.listen-server/`（可用环境变量 `LISTEN_SERVER_HOME` 指定其他目录）：
+源码运行时位于 `~/.listen-server/`，打包为 exe 后位于 exe 同级的 `config/`（均可用环境变量 `LISTEN_SERVER_HOME` 指定其他目录）：
 
 | 文件 | 内容 |
 | --- | --- |
@@ -209,3 +209,24 @@ uv sync
 uv run listen-server-gui      # 无控制台窗口（pythonw）
 uv run listen-server          # 带控制台窗口，便于看报错
 ```
+
+## 8. 打包为 exe
+
+```powershell
+uv run python run_build.py
+```
+
+使用 PyInstaller 打包为**单个 exe**（`--onefile`，不生成 `_internal` 文件夹），输出：
+
+```text
+dist/listen-server/
+├── listen-server.exe   # 双击运行；图标与资源已打入 exe
+└── config/             # 运行数据：services.json、state.json、logs/、autostart.log
+```
+
+- 打包后的数据目录为 exe 同级的 `config/`（源码运行时为 `~/.listen-server/`），整个 `dist/listen-server/` 文件夹可直接拷贝到其他机器使用
+- 重新打包只替换 exe，保留已有的 `config/`
+- exe 图标由 `resources/static/server.png` 自动转换为 `.ico`（无需 Pillow）
+- 开机自启写入的启动项为 `listen-server.exe --autostart`
+- 单文件 exe 运行时解压在临时目录 `_MEIxxxx`，退出即删除；启动服务前会清除指向该目录的环境变量（`TCL_LIBRARY`、`_PYI_*` 等），服务不受 listen-server 退出影响
+- `build/`、`dist/`、`*.spec` 均为打包产物，已加入 `.gitignore`

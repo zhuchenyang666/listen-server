@@ -6,8 +6,14 @@ import sys
 import tkinter as tk
 from pathlib import Path
 
-# src/listen_server/ui/icon.py -> 项目根目录
-ICON_PATH = Path(__file__).resolve().parents[3] / "resources" / "static" / "server.png"
+ICON_RELATIVE = Path("resources") / "static" / "server.png"
+
+if getattr(sys, "frozen", False):
+    # 打包后资源解压在 sys._MEIPASS 下（由 run_build.py 通过 --add-data 打入 exe）
+    ICON_PATH = Path(sys._MEIPASS) / ICON_RELATIVE
+else:
+    # src/listen_server/ui/icon.py -> 项目根目录
+    ICON_PATH = Path(__file__).resolve().parents[3] / ICON_RELATIVE
 APP_USER_MODEL_ID = "PigZhu.ListenServer"
 
 

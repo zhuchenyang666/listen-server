@@ -5,6 +5,7 @@ import locale
 import os
 import re
 import subprocess
+import sys
 import threading
 import time
 from datetime import datetime
@@ -97,8 +98,26 @@ def _spawn_terminal(name: str, command: str, cwd: Path, env: dict[str, str]) -> 
     return _popen_detached(args, subprocess.CREATE_NEW_CONSOLE, cwd=cwd, env=env)
 
 
+def _clean_frozen_env(env: dict[str, str]) -> None:
+    """单文件 exe 运行在临时目录 _MEIxxxx 中，退出即删除；不能让服务继承指向它的变量。"""
+    meipass = getattr(sys, "_MEIPASS", None)
+    if not meipass:
+        return
+    meipass = os.path.normcase(meipass)
+    for key in list(env):
+        if key.startswith(("_PYI", "_MEIPASS")) or meipass in os.path.normcase(env[key]):
+            if key.upper() == "PATH":
+                parts = [p for p in env[key].split(os.pathsep) if meipass not in os.path.normcase(p)]
+                env[key] = os.pathsep.join(parts)
+            else:
+                del env[key]
+    # 若被启动的服务本身也是 PyInstaller 程序，让它重新初始化自己的运行环境
+    env["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
+
+
 def build_env(svc: ServiceConfig) -> dict[str, str]:
     env = os.environ.copy()
+    _clean_frozen_env(env)
     env.update(svc.env)
     return env
 
